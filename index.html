@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Muslim Harian</title>
+    <style>
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #4CAF50;
+            --bg-color: #E8F5E9;
+            --text-color: #333;
+            --white: #ffffff;
+            --gold: #FFD700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Search Bar */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #ffffff;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .settings-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        .settings-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Bottom Navigation */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            z-index: 100;
+            height: 75px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #888;
+            background: none;
+            border: none;
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 70px;
+            transition: all 0.3s;
+        }
+
+        .nav-item span:first-child {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            font-weight: bold;
+            transform: scale(1.1);
+        }
+
+        /* Center Quran Button - Improved */
+        .quran-btn-wrapper {
+            position: relative;
+            top: -35px;
+        }
+
+        .quran-btn {
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(145deg, var(--primary-color), #1B5E20);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 
+                0 6px 20px rgba(46, 125, 50, 0.5),
+                0 0 0 5px var(--bg-color),
+                inset 0 2px 10px rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .quran-btn::before {
+            content: '☪';
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+
+        .quran-btn:active {
+            transform: scale(0.9);
+            box-shadow: 
+                0 3px 10px rgba(46, 125, 50, 0.5),
+                0 0 0 5px var(--bg-color);
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 110px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section {
+            display: none;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Home Tools */
+        .home-tools {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, var(--bg-color), #C8E6C9);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .tool-card svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .tool-card span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Styles untuk Jadwal Shalat */
+        .prayer-card {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px;
+            border-bottom: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        .prayer-card:hover {
+            background-color: #f5f5f5;
+        }
+        .prayer-card:last-child { border-bottom: none; }
+        .prayer-name { font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
+        .prayer-time { font-size: 1.1rem; font-weight: 600; }
+
+        /* Styles untuk Quran */
+        .quran-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quran-tab {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quran-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .surah-list, .juz-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .surah-item, .juz-item {
+            padding: 18px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .surah-item:hover, .juz-item:hover {
+            background-color: #E8F5E9;
+            transform: translateX(5px);
+        }
+
+        .arabic-text { font-family: 'Traditional Arabic', serif; font-size: 1.3rem; }
+        .surah-info { display: flex; flex-direction: column; }
+        .surah-name { font-weight: 600; color: var(--text-color); }
+        .surah-translation { font-size: 0.85rem; color: #666; }
+
+        .juz-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Modal Hadits Random */
+        #hadithModal, #asmaulHusnaModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 500px;
+            text-align: center;
+            border: 3px solid var(--primary-color);
+            position: relative;
+            animation: modalPop 0.4s;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { 
+            color: var(--primary-color); 
+            border-bottom: 3px solid var(--secondary-color); 
+            padding-bottom: 10px; 
+            margin-bottom: 20px;
+        }
+
+        /* Styles untuk Reader Quran */
+        #quran-reader { display: none; }
+        .ayah-card {
+            padding: 18px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        .ayah-arabic {
+            text-align: right;
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-family: 'Traditional Arabic', serif;
+            line-height: 1.8;
+        }
+        .ayah-translation { font-size: 1rem; color: #555; line-height: 1.6; }
+        .back-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none; 
+            padding: 12px 20px;
+            cursor: pointer; 
+            margin-bottom: 15px; 
+            border-radius: 25px;
+            font-weight: bold; 
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        /* Styles untuk Doa */
+        .doa-item { 
+            background: linear-gradient(135deg, #f9f9f9, #fff); 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            border-radius: 12px; 
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        .doa-item:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        .doa-title { font-weight: bold; color: var(--primary-color); margin-bottom: 8px; font-size: 1.1rem; }
+        .doa-arabic { font-family: 'Traditional Arabic', serif; font-size: 1.5rem; text-align: right; margin: 15px 0; color: #1B5E20; }
+        .doa-latin { font-style: italic; font-size: 0.95rem; color: #666; margin-bottom: 8px; }
+        .doa-meaning { font-size: 0.95rem; line-height: 1.6; }
+
+        /* Settings Styles */
+        .setting-section {
+            margin-bottom: 20px;
+        }
+        
+        .setting-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+        }
+
+        .setting-label svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary-color);
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+        }
+
+        .theme-switch input { display:none; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider { background-color: var(--secondary-color); }
+        input:checked + .slider:before { transform: translateX(28px); }
+
+        /* Language Selector */
+        .language-select {
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* Asmaul Husna */
+        .asmaul-husna-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .asmaul-husna-item {
+            background: linear-gradient(135deg, #FFFDE7, #FFF9C4);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .asmaul-husna-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .asmaul-husna-name {
+            font-family: 'Traditional Arabic', serif;
+            font-size: 1.4rem;
+            color: #1B5E20;
+            margin-bottom: 5px;
+        }
+
+        .asmaul-husna-arabic {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .asmaul-husna-meaning {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Tasbih */
+        .tasbih-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .tasbih-display {
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 30px 0;
+        }
+
+        .tasbih-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .tasbih-btn {
+            padding: 20px 40px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tasbih-increment {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .tasbih-reset {
+            background: #f5f5f5;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .tasbih-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Qibla */
+        #qibla-section {
+            text-align: center;
+        }
+
+        .compass-container {
+            width: 250px;
+            height: 250px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .compass-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .compass-needle {
+            width: 20px;
+            height: 120px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center bottom;
+            transition: transform 0.5s;
+        }
+
+        .compass-needle::before {
+            content: '⬆';
+            font-size: 2rem;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #f44336;
+        }
+
+        .compass-needle::after {
+            content: '⬇';
+            font-size: 2rem;
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+        }
+
+        .qibla-direction {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .home-tools {
+                grid-template-columns: 1fr;
+            }
+            
+            .asmaul-husna-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .search-container {
+                order: 2;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Cari Surat, Ayat, atau Info..." onkeyup="handleSearch()">
+        </div>
+        <button class="settings-btn" onclick="showSection('settings')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
+    </header>
+
+    <main>
+        <!-- Section Jadwal Shalat -->
+        <div id="shalat" class="section active">
+            <h2>Jadwal Shalat Hari Ini</h2>
+            <p>Lokasi: Jakarta (Default)</p>
+
+            <div class="home-tools">
+                <div class="tool-card" onclick="initQibla()">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                    <span>Arah Kiblat</span>
+                </div>
+                <div class="tool-card" onclick="showSection('tasbih')">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M17.5 10.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-5 0c.83 0 1.5-.67 1.5-1.5S13.33 7.5 12.5 7.5s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-5 0c.83 0 1.5-.67 1.5-1.5S8.33 7.5 7.5 7.5 6 8.17 6 9s.67 1.5 1.5 1.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                    <span>Tasbih Digital</span>
+                </div>
+            </div>
+
+            <div id="prayer-times-container">
+                Loading...
+            </div>
+        </div>
+
+        <!-- Section Quran -->
+        <div id="quran" class="section">
+            <div id="quran-list-view">
+                <div class="quran-tabs">
+                    <button class="quran-tab active" onclick="switchQuranTab('surah')">📖 Daftar Surat</button>
+                    <button class="quran-tab" onclick="switchQuranTab('juz')">📊 Daftar Juz</button>
+                </div>
+                
+                <!-- Surat List -->
+                <div id="surah-view">
+                    <ul id="surah-list-container" class="surah-list">
+                        Loading...
+                    </ul>
+                </div>
+                
+                <!-- Juz List -->
+                <div id="juz-view" style="display: none;">
+                    <ul id="juz-list-container" class="juz-list">
+                        Loading...
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="quran-reader">
+                <button class="back-btn" onclick="closeReader()">⬅ Kembali</button>
+                <h2 id="reader-title">Bacaan</h2>
+                <div id="reader-content"></div>
+            </div>
+        </div>
+
+        <!-- Section Hadist -->
+        <div id="hadist" class="section">
+            <h2>Kumpulan Hadits Pilihan</h2>
+            <p>Berikut adalah beberapa hadits shahih untuk renungan harian.</p>
+            <div id="static-hadith-list"></div>
+        </div>
+
+        <!-- Section Doa -->
+        <div id="doa" class="section">
+            <h2>Doa Harian</h2>
+            <div id="doa-list-container">Loading...</div>
+        </div>
+
+        <!-- Section Tasbih -->
+        <div id="tasbih" class="section">
+            <h2>Tasbih Digital</h2>
+            <div class="tasbih-container">
+                <div class="tasbih-display" id="tasbih-display">0</div>
+                <div class="tasbih-buttons">
+                    <button class="tasbih-btn tasbih-increment" onclick="incrementTasbih()">➕ Tasbih</button>
+                    <button class="tasbih-btn tasbih-reset" onclick="resetTasbih()">🔄 Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Qibla -->
+        <div id="qibla" class="section">
+            <h2>Arah Kiblat</h2>
+            <div id="qibla-section">
+                <p>Arahkan perangkat ke Kiblat (Ka'bah)</p>
+                <div class="compass-container">
+                    <div class="compass-bg">
+                        <div class="compass-needle" id="compass-needle"></div>
+                    </div>
+                </div>
+                <div class="qibla-direction" id="qibla-info">Memuat...</div>
+            </div>
+        </div>
+
+        <!-- Section Settings -->
+        <div id="settings" class="section">
+            <h2>Pengaturan</h2>
+            
+            <div class="setting-section">
+                <div class="setting-title">Tampilan</div>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+                        <span>Dark Mode</span>
+                    </div>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleTheme(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+                        <span>Bahasa</span>
+                    </div>
+                    <select class="language-select" id="language-select" onchange="changeLanguage(this.value)">
+                        <option value="id">Indonesia</option>
+                        <option value="en">English</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-section">
+                <div class="setting-title">Notifikasi</div>
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                        <span>Notifikasi Adzan</span>
+                    </div>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="adhan-toggle" onchange="toggleAdhan(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-section">
+                <div class="setting-title">Fitur Lainnya</div>
+                <div class="setting-row" onclick="showAsmaulHusna()">
+                    <div class="setting-label">
+                        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        <span>Asmaul Husna</span>
+                    </div>
+                    <span>➡</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav>
+        <button class="nav-item active" onclick="showSection('shalat')">
+            <span>📅</span>
+            <span>Jadwal</span>
+        </button>
+        
+        <div class="quran-btn-wrapper">
+            <div class="quran-btn" onclick="showSection('quran')">
+                <!-- Simple Book Icon SVG -->
+                <svg class="quran-icon" viewBox="0 0 24 24">
+                    <path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.05 1 5.5V21c0 .55.45 1 1 1 2.25 0 4.5-.5 5.5-1.5 1.45 1.1 3.55 1.5 5.5 1.5 2.25 0 4.5-.5 5.5-1.5V5zM19 19c-.85.3-2.1.5-3.5.5-1.95 0-4.05-.4-5.5-1.5v-13c1.45 1.1 3.55 1.5 5.5 1.5 1.4 0 2.65-.15 3.5-.5v13z"/>
+                </svg>
+            </div>
+        </div>
+
+        <button class="nav-item" onclick="showSection('doa')">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span>Doa</span>
+        </button>
+
+        <button class="nav-item" onclick="showSection('tasbih')">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M17.5 10.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-5 0c.83 0 1.5-.67 1.5-1.5S13.33 7.5 12.5 7.5s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-5 0c.83 0 1.5-.67 1.5-1.5S8.33 7.5 7.5 7.5 6 8.17 6 9s.67 1.5 1.5 1.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            <span>Tasbih</span>
+        </button>
+    </nav>
+
+    <!-- Audio Adzan -->
+    <audio id="adhan-audio" src="https://www.islamcan.com/audio/adhan/azan1.mp3" preload="none"></audio>
+
+    <!-- Modal Hadits Random -->
+    <div id="hadithModal">
+        <div class="modal-content">
+            <h3 style="color: var(--primary-color);">Hadits Hari Ini</h3>
+            <p id="random-hadith-text" style="font-style: italic; font-size: 1.1rem; margin: 20px 0;">...</p>
+            <p id="random-hadith-source" style="font-weight: bold;">...</p>
+            <button class="close-btn" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal Asmaul Husna -->
+    <div id="asmaulHusnaModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 style="color: var(--primary-color);">Asmaul Husna</h3>
+            <div class="asmaul-husna-grid" id="asmaul-husna-grid"></div>
+            <button class="close-btn" onclick="closeAsmaulHusnaModal()">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        // Data Hadits (Array Lokal untuk kecepatan dan keandalan demo)
+        const hadiths = [
+            { text: "Barangsiapa yang menempuh satu jalan untuk menuntut ilmu, maka Allah akan mudahkan baginya jalan menuju surga.", source: "HR. Muslim" },
+            { text: "Senyummu di hadapan saudaramu adalah sedekah.", source: "HR. Tirmidzi" },
+            { text: "Sebaik-baik kalian adalah orang yang belajar Al-Qur'an dan mengajarkannya.", source: "HR. Bukhari" },
+            { text: "Kebersihan adalah sebagian dari iman.", source: "HR. Muslim" },
+            { text: "Tidak akan masuk surga orang yang di dalam hatinya terdapat seberat biji sawi dari kesombongan.", source: "HR. Muslim" }
+        ];
+
+        const dailyDoa = [
+            { title: "Doa Sebelum Makan", arabic: "اَللّٰهُمَّ بَارِكْ لَنَا فِيْمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ", latin: "Allahumma baarik lanaa fiimaa rozaqtanaa wa qinaa 'adzaa bannaar", meaning: "Ya Allah, berkahilah kami dalam rezeki yang telah Engkau berikan kepada kami dan peliharalah kami dari siksa api neraka." },
+            { title: "Doa Sesudah Makan", arabic: "اَلْحَمْدُ ِللهِ الَّذِىْ اَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِيْنَ", latin: "Alhamdulillahilladzi ath-amanaa wa saqoonaa wa ja'alanaa minal muslimiin", meaning: "Segala puji bagi Allah yang telah memberi kami makan dan minum serta menjadikan kami termasuk dari kaum muslimin." },
+            { title: "Doa Sebelum Tidur", arabic: "بِسْمِكَ االلّٰهُمَّ اَحْيَا وَبِسْمِكَ اَمُوْتُ", latin: "Bismika Allahumma ahyaa wa bismika amuut", meaning: "Dengan menyebut nama-Mu, Ya Allah, aku hidup dan dengan menyebut nama-Mu aku mati." },
+            { title: "Doa Bangun Tidur", arabic: "اَلْحَمْدُ ِللهِ الَّذِىْ اَحْيَانَا بَعْدَمَآ اَمَاتَنَا وَاِلَيْهِ النُّشُوْرُ", latin: "Alhamdulillahilladzi ahyaanaa ba'damaa amaatanaa wa ilaihin nusyuur", meaning: "Segala puji bagi Allah yang telah menghidupkan kami sesudah kami mati (membangunkan dari tidur) dan hanya kepada-Nya kami dikembalikan." },
+            { title: "Doa Masuk Masjid", arabic: "اَللّٰهُمَّ افْتَحْ لِيْ اَبْوَابَ رَحْمَتِكَ", latin: "Allahummaf tahlii abwaaba rohmatik", meaning: "Ya Allah, bukalah untukku pintu-pintu rahmat-Mu." }
+        ];
+
+        let allSurahs = [];
+        let prayerTimings = {};
+
+        // 1. Fungsi Startup: Tampilkan Hadits Random
+        window.onload = function() {
+            const modal = document.getElementById('hadithModal');
+            const textElem = document.getElementById('random-hadith-text');
+            const sourceElem = document.getElementById('random-hadith-source');
+            
+            // Pilih random
+            const random = hadiths[Math.floor(Math.random() * hadiths.length)];
+            
+            textElem.innerText = `"${random.text}"`;
+            sourceElem.innerText = random.source;
+            
+            // Tampilkan modal
+            modal.style.display = 'flex';
+
+            // Load data API
+            fetchPrayerTimes();
+            fetchQuranList();
+            renderRandomHadiths();
+            renderRandomDoa();
+
+            // Load Settings
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            const isAdhan = localStorage.getItem('adhanEnabled') === 'true';
+            document.getElementById('dark-mode-toggle').checked = isDark;
+            document.getElementById('adhan-toggle').checked = isAdhan;
+            toggleTheme(isDark);
+
+            // Start Adhan Check
+            setInterval(checkAdhan, 1000);
+        };
+
+        function closeModal() {
+            document.getElementById('hadithModal').style.display = 'none';
+        }
+
+        // 2. Navigasi Tab
+        function showSection(id) {
+            // Sembunyikan semua section
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            // Nonaktifkan semua item navigasi
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.quran-btn').classList.remove('active');
+            
+            // Tampilkan yang dipilih
+            document.getElementById(id).classList.add('active');
+            
+            // Aktifkan item navigasi yang benar
+            if (id === 'quran') {
+                document.querySelector('.quran-btn').classList.add('active');
+            } else {
+                const navButton = Array.from(document.querySelectorAll('.nav-item')).find(btn => btn.getAttribute('onclick').includes(`'${id}'`));
+                if (navButton) {
+                    navButton.classList.add('active');
+                }
+            }
+        }
+
+        // 3. API Jadwal Shalat (Aladhan API)
+        async function fetchPrayerTimes() {
+            const container = document.getElementById('prayer-times-container');
+            try {
+                // Default Jakarta coordinates
+                const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Jakarta&country=Indonesia&method=20');
+                const data = await response.json();
+                prayerTimings = data.data.timings;
+
+                let html = '';
+                const prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+                
+                prayers.forEach(p => {
+                    html += `<div class="prayer-card" id="prayer-${p}">
+                                <span class="prayer-name">${p}</span>
+                                <span>${prayerTimings[p]}</span>
+                             </div>`;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = "Gagal memuat jadwal shalat.";
+            }
+        }
+
+        // 4. API Quran (Alquran Cloud) - Hanya List Surat
+        async function fetchQuranList() {
+            const container = document.getElementById('surah-list-container');
+            try {
+                const response = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await response.json();
+                allSurahs = data.data;
+                renderSurahs(allSurahs);
+            } catch (error) {
+                container.innerHTML = "Gagal memuat daftar surat.";
+            }
+        }
+
+        function renderSurahs(list) {
+            const container = document.getElementById('surah-list-container');
+            let html = '';
+            list.forEach(surah => {
+                html += `<li class="surah-item" onclick="loadSurah(${surah.number}, '${surah.englishName}')">
+                            <span>${surah.number}. ${surah.englishName} (${surah.englishNameTranslation})</span>
+                            <span class="arabic-text">${surah.name}</span>
+                         </li>`;
+            });
+            container.innerHTML = html;
+        }
+
+        async function loadSurah(number, name) {
+            const reader = document.getElementById('quran-reader');
+            const list = document.getElementById('quran-list-view');
+            const content = document.getElementById('reader-content');
+            const title = document.getElementById('reader-title');
+
+            list.style.display = 'none';
+            reader.style.display = 'block';
+            title.innerText = `Surat ${name}`;
+            content.innerHTML = '<p style="text-align:center">Memuat ayat...</p>';
+
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/editions/quran-uthmani,id.indonesian`);
+                const data = await res.json();
+                const arabic = data.data[0].ayahs;
+                const trans = data.data[1].ayahs;
+
+                let html = '';
+                arabic.forEach((ayah, index) => {
+                    html += `<div class="ayah-card">
+                                <div class="ayah-arabic">${ayah.text}</div>
+                                <div class="ayah-translation">${ayah.numberInSurah}. ${trans[index].text}</div>
+                             </div>`;
+                });
+                content.innerHTML = html;
+            } catch (e) {
+                content.innerHTML = '<p style="text-align:center; color:red">Gagal memuat ayat.</p>';
+            }
+        }
+
+        function closeReader() {
+            document.getElementById('quran-reader').style.display = 'none';
+            document.getElementById('quran-list-view').style.display = 'block';
+        }
+
+        // 5. Render Random Hadith List (berubah setiap kali login)
+        function renderRandomHadiths() {
+            const container = document.getElementById('static-hadith-list');
+            // Acak urutan hadits
+            const shuffledHadiths = [...hadiths].sort(() => Math.random() - 0.5);
+            // Ambil 3 hadits random untuk ditampilkan
+            const randomHadiths = shuffledHadiths.slice(0, 3);
+            
+            let html = '';
+            randomHadiths.forEach(h => {
+                html += `<div style="margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+                            <p>"${h.text}"</p>
+                            <small style="color: var(--primary-color); font-weight: bold;">${h.source}</small>
+                         </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // Render Random Doa (berubah setiap kali login)
+        function renderRandomDoa() {
+            const container = document.getElementById('doa-list-container');
+            // Acak urutan doa
+            const shuffledDoa = [...dailyDoa].sort(() => Math.random() - 0.5);
+            
+            let html = '';
+            shuffledDoa.forEach(d => {
+                html += `<div class="doa-item">
+                            <div class="doa-title">${d.title}</div>
+                            <div class="doa-arabic">${d.arabic}</div>
+                            <div class="doa-latin">${d.latin}</div>
+                            <div class="doa-meaning">"${d.meaning}"</div>
+                         </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // 6. Search Function
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            
+            // Filter Surahs
+            if (allSurahs.length > 0) {
+                const filtered = allSurahs.filter(s => 
+                    s.englishName.toLowerCase().includes(query) || 
+                    s.englishNameTranslation.toLowerCase().includes(query)
+                );
+                renderSurahs(filtered);
+                
+                // Auto switch to Quran tab if user is typing
+                if (query.length > 0) {
+                    showSection('quran');
+                }
+            }
+        }
+
+        // 7. Adhan Notification
+        function checkAdhan() {
+            const now = new Date();
+            const current = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+            
+            // Check standard prayers
+            ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach(p => {
+                if (prayerTimings[p] === current && now.getSeconds() === 0) {
+                    const audio = document.getElementById('adhan-audio');
+                    audio.play().catch(e => console.log("Audio play blocked: " + e));
+                    alert(`Waktunya Shalat ${p}!`);
+                }
+            });
+        }
+
+        // Settings Logic
+        function toggleTheme(isDark) {
+            localStorage.setItem('darkMode', isDark);
+            const root = document.documentElement;
+            if (isDark) {
+                root.style.setProperty('--bg-color', '#121212');
+                root.style.setProperty('--text-color', '#ffffff');
+                root.style.setProperty('--white', '#1e1e1e');
+            } else {
+                root.style.setProperty('--bg-color', '#E8F5E9');
+                root.style.setProperty('--text-color', '#333');
+                root.style.setProperty('--white', '#ffffff');
+            }
+        }
+
+        function toggleAdhan(isEnabled) {
+            localStorage.setItem('adhanEnabled', isEnabled);
+            if(isEnabled) alert("Notifikasi Adzan Aktif");
+        }
+
+        // 8. Tasbih Logic
+        let tasbihCount = 0;
+        const tasbihDisplay = document.getElementById('tasbih-display');
+
+        function incrementTasbih() {
+            tasbihCount++;
+            tasbihDisplay.innerText = tasbihCount;
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function resetTasbih() {
+            tasbihCount = 0;
+            tasbihDisplay.innerText = tasbihCount;
+        }
+
+        // 9. Qibla Logic
+        function initQibla() {
+            showSection('qibla');
+            const qiblaInfo = document.getElementById('qibla-info');
+            
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        } else {
+                            qiblaInfo.innerText = "Izin sensor orientasi ditolak.";
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        function handleOrientation(event) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const { latitude, longitude } = position.coords;
+                const kaabaLat = 21.422487;
+                const kaabaLon = 39.826206;
+
+                // Convert to Radians
+                const lat1 = latitude * Math.PI / 180;
+                const lon1 = longitude * Math.PI / 180;
+                const lat2 = kaabaLat * Math.PI / 180;
+                const lon2 = kaabaLon * Math.PI / 180;
+
+                const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
+                const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+                const qiblaBearing = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+
+                const compassHeading = event.webkitCompassHeading || event.alpha;
+                const needleRotation = 360 - compassHeading + qiblaBearing;
+                document.getElementById('compass-needle').style.transform = `translateX(-50%) translateY(-100%) rotate(${needleRotation}deg)`;
+            });
+        }
+
+        // 10. Juz Data and Functions
+        const juzData = [
+            { number: 1, name: "Juz 1", surahStart: 1, ayahStart: 1, surahEnd: 2, ayahEnd: 141 },
+            { number: 2, name: "Juz 2", surahStart: 2, ayahStart: 142, surahEnd: 2, ayahEnd: 252 },
+            { number: 3, name: "Juz 3", surahStart: 2, ayahStart: 253, surahEnd: 3, ayahEnd: 92 },
+            { number: 4, name: "Juz 4", surahStart: 3, ayahStart: 93, surahEnd: 4, ayahEnd: 23 },
+            { number: 5, name: "Juz 5", surahStart: 4, ayahStart: 24, surahEnd: 4, ayahEnd: 147 },
+            { number: 6, name: "Juz 6", surahStart: 4, ayahStart: 148, surahEnd: 5, ayahEnd: 81 },
+            { number: 7, name: "Juz 7", surahStart: 5, ayahStart: 82, surahEnd: 6, ayahEnd: 110 },
+            { number: 8, name: "Juz 8", surahStart: 6, ayahStart: 111, surahEnd: 7, ayahEnd: 87 },
+            { number: 9, name: "Juz 9", surahStart: 7, ayahStart: 88, surahEnd: 8, ayahEnd: 40 },
+            { number: 10, name: "Juz 10", surahStart: 8, ayahStart: 41, surahEnd: 9, ayahEnd: 92 },
+            { number: 11, name: "Juz 11", surahStart: 9, ayahStart: 93, surahEnd: 11, ayahEnd: 5 },
+            { number: 12, name: "Juz 12", surahStart: 11, ayahStart: 6, surahEnd: 12, ayahEnd: 52 },
+            { number: 13, name: "Juz 13", surahStart: 12, ayahStart: 53, surahEnd: 14, ayahEnd: 52 },
+            { number: 14, name: "Juz 14", surahStart: 14, ayahStart: 53, surahEnd: 16, ayahEnd: 128 },
+            { number: 15, name: "Juz 15", surahStart: 16, ayahStart: 129, surahEnd: 18, ayahEnd: 74 },
+            { number: 16, name: "Juz 16", surahStart: 18, ayahStart: 75, surahEnd: 20, ayahEnd: 135 },
+            { number: 17, name: "Juz 17", surahStart: 20, ayahStart: 136, surahEnd: 22, ayahEnd: 78 },
+            { number: 18, name: "Juz 18", surahStart: 22, ayahStart: 79, surahEnd: 25, ayahEnd: 120 },
+            { number: 19, name: "Juz 19", surahStart: 25, ayahStart: 121, surahEnd: 27, ayahEnd: 59 },
+            { number: 20, name: "Juz 20", surahStart: 27, ayahStart: 60, surahEnd: 29, ayahEnd: 45 },
+            { number: 21, name: "Juz 21", surahStart: 29, ayahStart: 46, surahEnd: 33, ayahEnd: 30 },
+            { number: 22, name: "Juz 22", surahStart: 33, ayahStart: 31, surahEnd: 36, ayahEnd: 27 },
+            { number: 23, name: "Juz 23", surahStart: 36, ayahStart: 28, surahEnd: 39, ayahEnd: 31 },
+            { number: 24, name: "Juz 24", surahStart: 39, ayahStart: 32, surahEnd: 41, ayahEnd: 46 },
+            { number: 25, name: "Juz 25", surahStart: 41, ayahStart: 47, surahEnd: 45, ayahEnd: 37 },
+            { number: 26, name: "Juz 26", surahStart: 45, ayahStart: 38, surahEnd: 51, ayahEnd: 30 },
+            { number: 27, name: "Juz 27", surahStart: 51, ayahStart: 31, surahEnd: 57, ayahEnd: 29 },
+            { number: 28, name: "Juz 28", surahStart: 57, ayahStart: 30, surahEnd: 66, ayahEnd: 33 },
+            { number: 29, name: "Juz 29", surahStart: 66, ayahStart: 34, surahEnd: 77, ayahEnd: 32 },
+            { number: 30, name: "Juz 30", surahStart: 77, ayahStart: 33, surahEnd: 114, ayahEnd: 6 }
+        ];
+
+        // Render Juz List
+        // Render Juz List ( Menggunakan data lokal - lebih cepat )
+        function renderJuzList() {
+            const container = document.getElementById('juz-list-container');
+            const juzNames = [
+                "Juz 1 - Al Fatiha & Al Baqarah",
+                "Juz 2 - Al Baqarah",
+                "Juz 3 - Al Baqarah & Ali Imran",
+                "Juz 4 - Ali Imran & An Nisa",
+                "Juz 5 - An Nisa",
+                "Juz 6 - An Nisa & Al Maidah",
+                "Juz 7 - Al Maidah & Al An'am",
+                "Juz 8 - Al An'am & Al A'raf",
+                "Juz 9 - Al A'raf & Al Anfal",
+                "Juz 10 - Al Anfal & At Taubah",
+                "Juz 11 - At Taubah & Hud",
+                "Juz 12 - Hud & Yusuf",
+                "Juz 13 - Yusuf & Ibrahim",
+                "Juz 14 - Ibrahim & Al Kahf",
+                "Juz 15 - Al Kahf & Maryam",
+                "Juz 16 - Maryam & Ta Ha",
+                "Juz 17 - Ta Ha & Al Anbiya",
+                "Juz 18 - Al Anbiya & Al Hajj",
+                "Juz 19 - Al Hajj & Al Mu'minun",
+                "Juz 20 - Al Mu'minun & Al Furqan",
+                "Juz 21 - Al Furqan & As Shu'ara",
+                "Juz 22 - As Shu'ara & An Naml",
+                "Juz 23 - An Naml & Al Qasas",
+                "Juz 24 - Al Qasas & Al 'Ankabut",
+                "Juz 25 - Al 'Ankabut & Ar Rum",
+                "Juz 26 - Ar Rum & Luqman",
+                "Juz 27 - Luqman & As Sajdah",
+                "Juz 28 - As Sajdah & Al Ahzab",
+                "Juz 29 - Al Ahzab & Saba",
+                "Juz 30 - Saba & An Nas"
+            ];
+            
+            let html = '';
+            for(let i = 1; i <= 30; i++) {
+                html += `<li class="juz-item" onclick="loadJuz(${i})">
+                            <div>
+                                <span style="font-weight: bold; color: var(--primary-color);">Juz ${i}</span>
+                                <span style="font-size: 0.8rem; color: #666; display: block;">${juzNames[i-1]}</span>
+                            </div>
+                            <div class="juz-badge">${i}</div>
+                         </li>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // Load Juz content
+        async function loadJuz(juzNumber) {
+            const reader = document.getElementById('quran-reader');
+            const list = document.getElementById('quran-list-view');
+            const content = document.getElementById('reader-content');
+            const title = document.getElementById('reader-title');
+
+            list.style.display = 'none';
+            reader.style.display = 'block';
+            title.innerText = `Juz ${juzNumber}`;
+            content.innerHTML = '<p style="text-align:center">Memuat ayat...</p>';
+
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/juz/${juzNumber}/editions/quran-uthmani,id.indonesian`);
+                const data = await res.json();
+                const arabic = data.data[0].ayahs;
+                const trans = data.data[1].ayahs;
+
+                let html = '';
+                let currentSurah = '';
+                arabic.forEach((ayah, index) => {
+                    if (currentSurah !== ayah.surah.englishName) {
+                        currentSurah = ayah.surah.englishName;
+                        html += `<div style="background: #E8F5E9; padding: 10px; margin: 10px 0; border-radius: 8px; font-weight: bold; color: var(--primary-color);">Surat ${currentSurah}</div>`;
+                    }
+                    html += `<div class="ayah-card">
+                                <div class="ayah-arabic">${ayah.text}</div>
+                                <div class="ayah-translation">${ayah.numberInSurah}. ${trans[index].text}</div>
+                             </div>`;
+                });
+                content.innerHTML = html;
+            } catch (e) {
+                content.innerHTML = '<p style="text-align:center; color:red">Gagal memuat ayat.</p>';
+            }
+        }
+
+        // Switch between Surah and Juz tabs
+        function switchQuranTab(tab) {
+            const surahView = document.getElementById('surah-view');
+            const juzView = document.getElementById('juz-view');
+            const tabs = document.querySelectorAll('.quran-tab');
+            
+            if (tab === 'surah') {
+                surahView.style.display = 'block';
+                juzView.style.display = 'none';
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                surahView.style.display = 'none';
+                juzView.style.display = 'block';
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+                
+                // Render Juz list if not already rendered
+                const juzContainer = document.getElementById('juz-list-container');
+                if (juzContainer.innerHTML === 'Loading...') {
+                    renderJuzList();
+                }
+            }
+        }
+
+        // 11. Asmaul Husna Data
+        const asmaulHusna = [
+            { name: "Ar Rahman", arabic: "الرحمن", meaning: "Yang Maha Pengasih" },
+            { name: "Ar Rahiim", arabic: "الرحيم", meaning: "Yang Maha Penyayang" },
+            { name: "Al Malik", arabic: "الملك", meaning: "Yang Maha Meraja" },
+            { name: "Al Quddus", arabic: "القدوس", meaning: "Yang Maha Suci" },
+            { name: "As Salaam", arabic: "السلام", meaning: "Yang Maha Sejahtera" },
+            { name: "Al Mu'min", arabic: "المؤمن", meaning: "Yang Maha Beriman" },
+            { name: "Al Muhaimin", arabic: "المهيمن", meaning: "Yang Maha Pemelihara" },
+            { name: "Al Aziiz", arabic: "العزيز", meaning: "Yang Maha Perkasa" },
+            { name: "Al Jabbar", arabic: "الجبار", meaning: "Yang Maha Memaksa" },
+            { name: "Al Mutakabbir", arabic: "المتكبر", meaning: "Yang Maha Megah" },
+            { name: "Al Khaliq", arabic: "الخالق", meaning: "Yang Maha Pencipta" },
+            { name: "Al Baari'", arabic: "البارئ", meaning: "Yang Maha Membuat" },
+            { name: "Al Mushawwir", arabic: "المصور", meaning: "Yang Maha Membentuk" },
+            { name: "Al Ghaffaar", arabic: "الغفار", meaning: "Yang Maha Pengampun" },
+            { name: "Al Qahhaar", arabic: "القهار", meaning: "Yang Maha Menundukkan" },
+            { name: "Al Wahhaab", arabic: "الوهاب", meaning: "Yang Maha Pemberi" },
+            { name: "Ar Razzaaq", arabic: "الرزاق", meaning: "Yang Maha Pemberi Rezeki" },
+            { name: "Al Fattaah", arabic: "الفتاح", meaning: "Yang Maha Pembuka" },
+            { name: "Al 'Aliim", arabic: "العليم", meaning: "Yang Maha Mengetahui" },
+            { name: "Al Qabidh", arabic: "القابض", meaning: "Yang Maha Menyempitkan" },
+            { name: "Al Baasith", arabic: "الباسط", meaning: "Yang Maha Melapangkan" },
+            { name: "Al Khauf", arabic: "الخافض", meaning: "Yang Maha Merendahkan" },
+            { name: "Ar Raafi'", arabic: "الرافع", meaning: "Yang Maha Meninggikan" },
+            { name: "Al Mu'izz", arabic: "المعز", meaning: "Yang Maha Memuliakan" },
+            { name: "Al Mudhill", arabic: "المذيل", meaning: "Yang Maha Menghina" },
+            { name: "As Samii'", arabic: "السميع", meaning: "Yang Maha Mendengar" },
+            { name: "Al Bashiir", arabic: "البصير", meaning: "Yang Maha Melihat" },
+            { name: "Al Hakam", arabic: "الحكم", meaning: "Yang Maha Menetapkan" },
+            { name: "Al 'Adl", arabic: "العدل", meaning: "Yang Maha Adil" },
+            { name: "Al Latiif", arabic: "اللطيف", meaning: "Yang Maha Lembut" },
+            { name: "Al Khabiir", arabic: "الخبير", meaning: "Yang Maha Mengenal" },
+            { name: "Al Haliim", arabic: "الحليم", meaning: "Yang Maha Penyantun" },
+            { name: "Al 'Azhiim", arabic: "العظيم", meaning: "Yang Maha Besar" },
+            { name: "Al Ghafuur", arabic: "الغفور", meaning: "Yang Maha Pengampun" },
+            { name: "As Syakuur", arabic: "الشكور", meaning: "Yang Maha Mensyukuri" },
+            { name: "Al 'Aliy", arabic: "العلي", meaning: "Yang Maha Tinggi" },
+            { name: "Al Kabiir", arabic: "الكبير", meaning: "Yang Maha Besar" },
+            { name: "Al Hafizh", arabic: "الحفيظ", meaning: "Yang Maha Memelihara" },
+            { name: "Al Muqit", arabic: "المقيت", meaning: "Yang Maha Memberi Makanan" },
+            { name: "Al Hasiib", arabic: "الحسيب", meaning: "Yang Maha Menghitung" },
+            { name: "Al Jaliil", arabic: "الجليل", meaning: "Yang Maha Mulia" },
+            { name: "Al Kariim", arabic: "الكريم", meaning: "Yang Maha Mulia" },
+            { name: "Ar Raqiib", arabic: "الرقيب", meaning: "Yang Maha Mengawasi" },
+            { name: "Al Mujiib", arabic: "المجيب", meaning: "Yang Maha Mengabulkan" },
+            { name: "Al Waasi'", arabic: "الواسع", meaning: "Yang Maha Luas" },
+            { name: "Al Hakiim", arabic: "الحكيم", meaning: "Yang Maha Bijaksana" },
+            { name: "Al Waduud", arabic: "الودود", meaning: "Yang Maha Mencintai" },
+            { name: "Al Majiid", arabic: "المجيد", meaning: "Yang Maha Mulia" },
+            { name: "Al Baa'its", arabic: "الباعث", meaning: "Yang Maha Membangkitkan" },
+            { name: "As Syahiid", arabic: "الشهيد", meaning: "Yang Maha Menyaksikan" },
+            { name: "Al Haqq", arabic: "الحق", meaning: "Yang Maha Benar" },
+            { name: "Al Wakiil", arabic: "الوكيل", meaning: "Yang Maha Memelihara" },
+            { name: "Al Qawiyyu", arabic: "القوي", meaning: "Yang Maha Kuat" },
+            { name: "Al Matiin", arabic: "المتين", meaning: "Yang Maha Kokoh" },
+            { name: "Al Waliyy", arabic: "الولي", meaning: "Yang Maha Pelindung" },
+            { name: "Al Hamiid", arabic: "الحميد", meaning: "Yang Maha Terpuji" },
+            { name: "Al Muhshi", arabic: "المحصي", meaning: "Yang Maha Menghitung" },
+            { name: "Al Mubdi'", arabic: "المبدئ", meaning: "Yang Maha Memulai" },
+            { name: "Al Mu'iid", arabic: "المعيد", meaning: "Yang Maha Mengembalikan" },
+            { name: "Al Muhyii", arabic: "المحيي", meaning: "Yang Maha Menghidupkan" },
+            { name: "Al Mumiitu", arabic: "المميت", meaning: "Yang Maha Mematikan" },
+            { name: "Al Hayyu", arabic: "الحي", meaning: "Yang Maha Hidup" },
+            { name: "Al Qayyuum", arabic: "القيوم", meaning: "Yang Maha Berdiri Sendiri" },
+            { name: "Al Waajid", arabic: "الواجد", meaning: "Yang Maha Menemukan" },
+            { name: "Al Maajid", arabic: "الماجد", meaning: "Yang Maha Mulia" },
+            { name: "Al Wahiid", arabic: "الواحد", meaning: "Yang Maha Esa" },
+            { name: "Al Ahad", arabic: "الأحد", meaning: "Yang Maha Esa" },
+            { name: "As Shamad", arabic: "الصمد", meaning: "Yang Maha Dimintai" },
+            { name: "Al Qaadir", arabic: "القادر", meaning: "Yang Maha Mampu" },
+            { name: "Al Muqtadir", arabic: "المقتدر", meaning: "Yang Maha Kuasa" },
+            { name: "Al Muqaddim", arabic: "المقدم", meaning: "Yang Maha Mendahulukan" },
+            { name: "Al Mu'akkhir", arabic: "المؤخر", meaning: "Yang Maha Mengakhirkan" },
+            { name: "Al Awwal", arabic: "الأول", meaning: "Yang Maha Awal" },
+            { name: "Al Aakhir", arabic: "الأخر", meaning: "Yang Maha Akhir" },
+            { name: "Az Zhaahir", arabic: "الظاهر", meaning: "Yang Maha Zhahir" },
+            { name: "Al Baathin", arabic: "الباطن", meaning: "Yang Maha Batin" },
+            { name: "Al Waali", arabic: "الوالي", meaning: "Yang Maha Memerintah" },
+            { name: "Al Muta'aalii", arabic: "المتعالي", meaning: "Yang Maha Tinggi" },
+            { name: "Al Barri", arabic: "البر", meaning: "Yang Maha Baik" },
+            { name: "At Tawwaab", arabic: "التواب", meaning: "Yang Maha Menerima Tobat" },
+            { name: "Al Muntaqim", arabic: "المنتقم", meaning: "Yang Maha Menuntut Balas" },
+            { name: "Al 'Afuww", arabic: "العفو", meaning: "Yang Maha Pemaaf" },
+            { name: "Ar Ra'uuf", arabic: "الرؤوف", meaning: "Yang Maha Penyayang" },
+            { name: "Maalikul Mulk", arabic: "مالك الملك", meaning: "Yang Maha Memiliki Kerajaan" },
+            { name: "Dzul Jalaali Wal Ikraam", arabic: "ذو الجلال والإكرام", meaning: "Yang Memiliki Keagungan dan Kemuliaan" },
+            { name: "Al Muqsith", arabic: "المقسط", meaning: "Yang Maha Adil" },
+            { name: "Al Jamii'", arabic: "الجامع", meaning: "Yang Maha Mengumpulkan" },
+            { name: "Al Ghaniy", arabic: "الغني", meaning: "Yang Maha Kaya" },
+            { name: "Al Mughnii", arabic: "المغني", meaning: "Yang Maha Memberi Kekayaan" },
+            { name: "Al Maani'", arabic: "المانع", meaning: "Yang Maha Mencegah" },
+            { name: "Ad Dhaar", arabic: "الضار", meaning: "Yang Maha Memberi Mudharat" },
+            { name: "An Nafii'", arabic: "النافع", meaning: "Yang Maha Memberi Manfaat" },
+            { name: "An Nuur", arabic: "النور", meaning: "Yang Maha Cahaya" },
+            { name: "Al Haadii", arabic: "الهادي", meaning: "Yang Maha Memberi Petunjuk" },
+            { name: "Al Badii'", arabic: "البديع", meaning: "Yang Maha Pencipta" },
+            { name: "Al Baaqii", arabic: "الباقي", meaning: "Yang Maha Kekal" },
+            { name: "Al Waarits", arabic: "الوارث", meaning: "Yang Maha Mewaris" },
+            { name: "Ar Rasyiid", arabic: "الرشيد", meaning: "Yang Maha Memberi Petunjuk" },
+            { name: "As Shabuur", arabic: "الصبور", meaning: "Yang Maha Sabar" }
+        ];
+
+        // Show Asmaul Husna Modal
+        function showAsmaulHusna() {
+            const modal = document.getElementById('asmaulHusnaModal');
+            const container = document.getElementById('asmaul-husna-grid');
+            
+            let html = '';
+           asmaulHusna.forEach(husna => {
+                html += `<div class="asmaul-husna-item" onclick="showAsmaulHusnaDetail('${husna.name}', '${husna.arabic}', '${husna.meaning}')">
+                            <div class="asmaul-husna-name">${husna.arabic}</div>
+                            <div class="asmaul-husna-arabic">${husna.name}</div>
+                            <div class="asmaul-husna-meaning">${husna.meaning}</div>
+                         </div>`;
+            });
+            
+            container.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+
+        function showAsmaulHusnaDetail(name, arabic, meaning) {
+            const modal = document.getElementById('asmaulHusnaModal');
+            modal.style.display = 'none';
+            alert(`${arabic}\n${name}\n${meaning}`);
+        }
+
+        // 12. Language Change Function
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            
+            const translations = {
+                id: {
+                    prayerTitle: "Jadwal Shalat Hari Ini",
+                    location: "Lokasi: Jakarta (Default)",
+                    qibla: "Arah Kiblat",
+                    tasbih: "Tasbih Digital",
+                    quran: "Daftar Surat",
+                    juz: "Daftar Juz",
+                    hadist: "Kumpulan Hadits Pilihan",
+                    doa: "Doa Harian",
+                    settings: "Pengaturan",
+                    darkMode: "Dark Mode",
+                    language: "Bahasa",
+                    adhan: "Notifikasi Adzan",
+                   asmaulHusna: "Asmaul Husna"
+                },
+                en: {
+                    prayerTitle: "Today's Prayer Schedule",
+                    location: "Location: Jakarta (Default)",
+                    qibla: "Qibla Direction",
+                    tasbih: "Digital Tasbih",
+                    quran: "Surah List",
+                    juz: "Juz List",
+                    hadist: "Selected Hadiths",
+                    doa: "Daily Prayers",
+                    settings: "Settings",
+                    darkMode: "Dark Mode",
+                    language: "Language",
+                    adhan: "Adzan Notification",
+                   asmaulHusna: "Asmaul Husna"
+                },
+                ar: {
+                    prayerTitle: "جدول الصلاة اليوم",
+                    location: "الموقع: جاكرتا (افتراضي)",
+                    qibla: "اتجاه القبلة",
+                    tasbih: "تسبيح رقمي",
+                    quran: "قائمة السور",
+                    juz: "قائمة الأجزاء",
+                    hadist: "اختيار الأحاديث",
+                    doa: "الادعية اليومية",
+                    settings: "الإعدادات",
+                    darkMode: "الوضع الداكن",
+                    language: "اللغة",
+                    adhan: "إشligation الأذان",
+                   asmaulHusna: "أسماء الله الحسنى"
+                }
+            };
+            
+            const t = translations[lang];
+            
+            // Update page content based on language
+            document.querySelector('#shalat h2').innerText = t.prayerTitle;
+            document.querySelector('#shalat p').innerText = t.location;
+            document.querySelector('#quran h2').innerText = t.quran;
+            document.querySelector('#hadist h2').innerText = t.hadist;
+            document.querySelector('#doa h2').innerText = t.doa;
+            document.querySelector('#tasbih h2').innerText = t.tasbih;
+            document.querySelector('#qibla h2').innerText = t.qibla;
+            document.querySelector('#settings h2').innerText = t.settings;
+            
+            // Update tab buttons
+            const tabs = document.querySelectorAll('.quran-tab');
+            if(tabs[0]) tabs[0].innerText = '📖 ' + t.quran;
+            if(tabs[1]) tabs[1].innerText = '📊 ' + t.juz;
+            
+            alert("Bahasa berhasil diubah ke: " + (lang === 'id' ? 'Indonesia' : lang === 'en' ? 'English' : 'العربية'));
+        }
+
+        // Close modal function
+        function closeAsmaulHusnaModal() {
+            document.getElementById('asmaulHusnaModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
